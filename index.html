@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang='ru'>
+<head>
+<meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel='stylesheet' href='assets/css/style.min.css'>
+  <title>Game For Prog</title>
+</head>
+<body>
+  <div class="wrapper">
+    <main>
+      <div class="container">
+        <div class="center my-40">
+          <h1>GAME FOR PROG</h1>
+        </div>
+        <div class="center my-20">
+          <button id="start" class="btn btn-w" id="start">
+            <p>Начать</p>
+            <svg width="265" fill="#06BB43" height="50" viewBox="0 0 265 50">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7 3.75H13V0H20H245H252V3.75H258V8.75H262V16.25H265V33.75H262V41.25H258V46.25H252V50H245H20H13V46.25H7V41.25H3V33.75H0V16.25H3V8.75H7V3.75Z" />
+            </svg>
+          </button>
+        </div>
+        <div class="msg">
+          <div class="msg__text">
+            <p>Ой, что-то пошло не так...</p>
+            <p>Посмотри в логах, где ошибка и исправь</p>
+          </div>
+          
+          <div class="msg__accept"><span>ОК</span></div>
+        </div>
+        <!-- <div class="log">
+
+        </div> -->
+
+        <div class="game-touch">
+
+        </div>
+      
+      </div>
+    </main>
+
+    <template id="touch-block">
+      <div class="touch">
+        <div class="pin">
+          <span>*</span>
+          <span>*</span>
+          <span>*</span>
+          <span>*</span>
+        </div>
+        <div class="touch__list">
+
+        </div>
+      </div>
+    </template>
+
+    <template id="touch-num">
+      <div class="touch__number">
+        <!-- <p class="touch__number"></p> -->
+      </div>
+    </template>
+
+  </div>
+  <script src="assets/js/index.js"></script>
+
+</body>
+</html>
