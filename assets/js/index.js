@@ -4,50 +4,119 @@ const _bounce = document.querySelector('.bounce')
 const _target = document.querySelector('.target')
 const _game = document.querySelector('.game')
 
-const GAME = {
-  bounce: {
-    pos: {
-      x: 0,
-      y: 0
-    }
-  },
-  field: {
-    l: 0,
-    r: 0,
-    t: 0,
-    b: 0
-  }
-}
-
 const STEPS = [
   false, false, false, false, false
 ]
 
+const sndShowMsg = new Audio('./assets/sounds/msg.wav')
+const sndHideMsg = new Audio('./assets/sounds/ok.wav')
+const sndStart = new Audio('./assets/sounds/start.wav')
+const sndClick = new Audio('./assets/sounds/click.wav')
+const sndSuccess = new Audio('./assets/sounds/success.wav')
+const sndError = new Audio('./assets/sounds/error.wav')
+const sndBg = new Audio('./assets/sounds/background.mp3')
 
-// GAME.field.l = _game.offsetLeft
-// GAME.field.t = _game.offsetTop
-// GAME.field.r = _game.offsetLeft + _game.offsetWidth
-// GAME.field.b = _game.offsetTop + _game.offsetHeight
+class Message{
+  constructor({msgElement, msgSelector, isSound = true}){
+    // this.msgElement = msgElement ?? document.querySelector(msgSelector) ?? null
+    this.msgElement = document.querySelector('#message').content.cloneNode(true).querySelector('.msg')
+    this.isSound = isSound
+    this.isShow = false
 
-
-let acl = new Accelerometer({frequency: 30});
-
-
-// acl.addEventListener('reading', step2)
-
-function step2() {
-  if(Math.abs(acl.y) > 35){
-    fixAcl() 
+    const wrap = document.createElement('div')
+    wrap.classList.add('msg__wrap')
+    wrap.append(this.msgElement)
+    document.querySelector('.wrapper').append(wrap)
+    this.msgDom = document.querySelector('.msg')
+  }
+  soundShow(){
+    sndShowMsg.volume = 0.15
+    sndShowMsg.play()
+  }
+  soundHide(){
+    sndHideMsg.volume = 0.15
+    sndHideMsg.play()
+  }
+  show(text) {
+    console.log('show')
+    if(this.isShow) return
+    
+    
+    if(text){
+      this.msgDom.querySelector('.msg__text').innerHTML = text
+    }
+    setTimeout(() => {
+      this.isShow = true
+      this.soundShow()
+      this.msgDom.classList.add('msg-open')
+      
+    }, 200);
+    
+    this.msgDom.querySelector('.msg__accept span').addEventListener('click', () => {
+      this.soundHide()
+      this.hide()
+    }, {once: true})
+  }
+  hide() {
+    this.isShow = false
+    this.msgDom.classList.remove('msg-open')
   }
 }
 
 
+let acl = new Accelerometer({frequency: 30});
+let msg = new Message({msgElement: _msg})
+
+acl.start();
+
+_start.addEventListener('click', start)
+_start.addEventListener('click', () => {
+  
+  window.onblur = () => {
+    sndBg.muted = true
+    sndBg.pause()
+  }
+  window.onfocus = () => {
+    sndBg.muted = false
+    sndBg.loop = true
+    sndBg.volume = 0.75
+    sndBg.play()
+  }
+
+  
+  
+  sndBg.play()
+}, {once: true})
+_start.addEventListener('click', () => {
+  sndStart.volume = 0.3
+  sndStart.play()
+})
+
+
+function start(e) {
+  
+  
+  
+  // TODO: сделать msg <template> и передавать сюда текст
+  console.log('Произошла ошибка. Чтобы исправить её, зайдите с телефона, нажмите НАЧАТЬ и потрясите его')
+  let msgText = `<p>Ой, что-то пошло не так...</p>
+  <p>Посмотри в логах, где ошибка и исправь</p>`
+  msg.show(msgText)
+
+  acl.addEventListener('reading', checkShake)
+
+}
+
+
 function step3() {
+  
   renderPinCode()
-  console.log('Время постоянно уходит... Поспеши!!!')
-  let PIN = `${new Date().getHours()}${new Date().getMinutes()}`;
+  msg.show(`<p>С каждой минутой время постоянно уходит... Поспеши!!!</p>`)
+  console.log('С каждой минутой время постоянно уходит... Поспеши!!!')
+  let PIN = generatePIN();
+  console.log(PIN)
   let reloadPin = setInterval(() => {
-    PIN = `${new Date().getHours()}${new Date().getMinutes()}`;
+    PIN = generatePIN();
   }, 1000);
 
   const touch = document.querySelector('.touch')
@@ -62,6 +131,10 @@ function step3() {
   })
 
   function onClickNum(e) {
+    
+    sndClick.volume = 0.65
+    sndClick.play()
+
     const num = e.target.getAttribute('data-num')
     
     if(code.length < 4){
@@ -74,6 +147,10 @@ function step3() {
     if(code.length === 4){
       if(code.join('') === PIN){
         console.log('Код верный')
+
+        sndSuccess.volume = 0.8
+        sndSuccess.play()
+
         clearInterval(reloadPin)
         setTimeout(() => {
           touch.classList.add('success')
@@ -89,6 +166,9 @@ function step3() {
         })
       } else{
         // Если код неверный
+        sndError.volume = 0.8
+        sndError.play()
+
         _pin.classList.add('error')
         setTimeout(() => {
           clear()
@@ -106,6 +186,43 @@ function step3() {
 
 }
 
+
+function checkShake() {
+  if(Math.abs(acl.y) > 35){
+    fixAcl() 
+  }
+}
+
+function fixAcl() {
+  console.log('Молодец! Ты исправил ошибку :)')
+
+  msg.hide()
+
+  setTimeout(() => {
+    let text = `
+    <p>Ошибка исправлена</p>
+    <p>Оказывается надо было просто вызвать функцию fixAcl()</p>
+    <p>Ну или потрясти телефоном в твоем случае :3</p>
+    <p>Попробуйте еще раз НАЧАТЬ игру</p>
+    `
+    msg.show(text)
+
+    _start.removeEventListener('click', start)
+    // запускаем следующий шаг
+    _start.addEventListener('click', step3, {once: true})
+  }, 300);
+
+    
+    acl.removeEventListener('reading', checkShake)
+}
+
+
+
+
+
+
+
+
 function renderPinCode(e) {
   const tempBlock = document.querySelector('#touch-block')
   const tempNum = document.querySelector('#touch-num')
@@ -121,7 +238,7 @@ function renderPinCode(e) {
     const numList = cloneBlock.querySelector('.touch__list')
     numList.append(cloneNum)
     if(i === 9){
-      i=0
+      i = 0 
       const cloneNum = tempNum.content.cloneNode(true);
       const numb = cloneNum.querySelector('.touch__number')
       numb.textContent = i
@@ -129,7 +246,7 @@ function renderPinCode(e) {
       // берем
       const numList = cloneBlock.querySelector('.touch__list')
       numList.append(cloneNum)
-      i=9
+      i = 9
     }
   }
 
@@ -137,50 +254,11 @@ function renderPinCode(e) {
 }
 
 
-function fixAcl() {
-  console.log('Молодец! Ты исправил ошибку :)')
-    _msg.classList.remove('msg-open')
-    setTimeout(() => {
-      _msg.querySelector('.msg__text').innerHTML = `
-      <p>Ошибка исправлена</p>
-      <p>Оказывается надо было просто вызвать функцию fixAcl()</p>
-      <p>Ну или потрясти телефон в твоем случае :3</p>
-      <p>Попробуйте еще раз НАЧАТЬ игру</p>
-      `
-      _msg.classList.add('msg-open')
-      _msg.querySelector('.msg__accept span').onclick = () => {
-        _msg.classList.remove('msg-open')
-        
-      }
-      _start.removeEventListener('click', start)
-      // запускаем следующий шаг
-      _start.addEventListener('click', step3, {once: true})
-    }, 700);
-
-    
-    acl.removeEventListener('reading', step2)
-}
-
-
-acl.start();
-
-
-
-_start.addEventListener('click', start)
-
-function start(e) {
-  
-  _msg.classList.add('msg-open')
-
-  acl.addEventListener('reading', step2)
-
-  console.log('Произошла ошибка. Чтобы исправить её, зайдите с телефона, нажмите НАЧАТЬ и потрясите его')
-
-
-  _msg.querySelector('.msg__accept span').onclick = () => {
-    _msg.classList.remove('msg-open')
-  }
-  
+function generatePIN() {
+  let d = new Date()
+  let h = d.getHours() < 10 ? '0' + d.getHours() : d.getHours()
+  let m = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()
+  return `${h}${m}`;
 }
 
 function step(num) {
@@ -192,60 +270,3 @@ function step(num) {
     }
   }
 }
-
-
-
-
-/* acl.addEventListener('reading', () => {
-  // document.querySelector('.log').innerHTML = `X = ${acl.x.toFixed(0)}<br>Y = ${acl.y.toFixed(0)}<br>Z = ${acl.z.toFixed(0)}`
-  // console.log("Acceleration along the X-axis " + acl.x.toFixed(1));
-  // console.log("Acceleration along the Y-axis " + acl.y.toFixed(1));
-  // console.log("Acceleration along the Z-axis " + acl.z.toFixed(1));
-  if(Math.abs(acl.y) > 35){
-    console.log('Ты сделал задание')
-  }
-  let ax = +acl.x.toFixed(2)
-  let ay = +acl.y.toFixed(2) 
-  console.log([ax, ay])
-  let x = (GAME.bounce.pos.x += -ax * 1.2).toFixed(2)
-  let y = (GAME.bounce.pos.y += +ay * 1.2).toFixed(2)
-
-  console.dir(GAME.field)
-  console.dir(GAME.bounce.pos)
-
-  // if(x >= GAME.field.r){
-  //   x = GAME.field.r
-  // }
-  // if(x <= GAME.field.l){
-  //   console.log('left')
-  //   x = GAME.field.l
-  // }
-  // if(y <= GAME.field.t){
-  //   y = GAME.field.t
-  // }
-  // if(y >= GAME.field.b){
-  //   y = GAME.field.b
-  // }
-  
-  if(x <= 0){
-    x = 0
-  }
-  if(x + _bounce.clientWidth >= _game.clientWidth){
-    x = _game.clientWidth - _bounce.offsetWidth -1
-  }
-  if(y <= 0){
-    y = 0
-  }
-  if(y + _bounce.clientHeight >= _game.clientHeight){
-    y = _game.clientHeight -  _bounce.offsetHeight -1
-  }
-
-  document.querySelector('.log').innerHTML = `X = ${x}<br>Y = ${y}`
-  // console.log('x: ', x)
-  // console.log('y: ', y)
-  _bounce.style.top = `${y}px`
-  _bounce.style.left = `${x}px`
-
-  
-  
-}); */
