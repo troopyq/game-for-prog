@@ -38,7 +38,6 @@ class Message{
     sndHideMsg.play()
   }
   show(text) {
-    console.log('show')
     if(this.isShow) return
     
     
@@ -95,12 +94,10 @@ _start.addEventListener('click', () => {
 
 function start(e) {
   
-  
-  
-  // TODO: сделать msg <template> и передавать сюда текст
-  console.log('Произошла ошибка. Чтобы исправить её, зайдите с телефона, нажмите НАЧАТЬ и потрясите его')
+  // console.log('Произошла ошибка. Чтобы исправить её, зайдите с телефона, нажмите НАЧАТЬ и потрясите его')
+  log({t: 'Произошла ошибка. Попробуйте потрясти телефоном вверх-вниз. Ну а вдруг сработает...'})
   let msgText = `<p>Ой, что-то пошло не так...</p>
-  <p>Посмотри в логах, где ошибка и исправь</p>`
+  <p>Посмотри в логах, почему произошла ошибка. Вдруг ты сможешь ее исправить</p>`
   msg.show(msgText)
 
   acl.addEventListener('reading', checkShake)
@@ -112,9 +109,15 @@ function step3() {
   
   renderPinCode()
   msg.show(`<p>С каждой минутой время постоянно уходит... Поспеши!!!</p>`)
-  console.log('С каждой минутой время постоянно уходит... Поспеши!!!')
+  // console.log('С каждой минутой время постоянно уходит... Поспеши!!!')
+  log({t: 'С каждой минутой время постоянно уходит... Поспеши!!!'})
+  
+  setTimeout(() => {
+    log({t: 'Сколько сейчас время?'})
+  }, 15000);
+
   let PIN = generatePIN();
-  console.log(PIN)
+
   let reloadPin = setInterval(() => {
     PIN = generatePIN();
   }, 1000);
@@ -146,8 +149,7 @@ function step3() {
     // авторизация пин кода
     if(code.length === 4){
       if(code.join('') === PIN){
-        console.log('Код верный')
-
+        log({t: 'Код верный', color: '#5E5'})
         sndSuccess.volume = 0.8
         sndSuccess.play()
 
@@ -168,6 +170,8 @@ function step3() {
         // Если код неверный
         sndError.volume = 0.8
         sndError.play()
+        // console.log('Код неправильный...')
+        log({t: 'Код неправильный...', color: '#E55'})
 
         _pin.classList.add('error')
         setTimeout(() => {
@@ -194,8 +198,9 @@ function checkShake() {
 }
 
 function fixAcl() {
-  console.log('Молодец! Ты исправил ошибку :)')
-
+  // console.log('Молодец! Ты исправил ошибку :)')
+  log({t: 'Молодец! Ты исправил ошибку :)'})
+  eruda.hide();
   msg.hide()
 
   setTimeout(() => {
@@ -269,4 +274,8 @@ function step(num) {
       }
     }
   }
+}
+log({t: 'GAME FOR PROG'})
+function log({t, size = '15', color = '#fff', bg, style}) {
+  console.log(`%c${t}`, `color: ${color}; font-size: ${size}px; line-height: 1.5; background-color: #000; padding: 5px 10px; font-family: 'Game', Helvetica, sans-serif; ${style}`)
 }

@@ -7,9 +7,31 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <link rel='stylesheet' href='assets/css/style.min.css'>
   <title>Game For Prog</title>
+  
 </head>
 <body>
+  <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+  const el = document.createElement('div');
+  el.classList.add('console')
+  document.body.appendChild(el);
+    
+  eruda.init({
+    container: el,
+    tool: ['console'],
+    useShadowDom: false,
+    autoScale: true,
+    defaults: {
+      displaySize: 65,
+      transparency: 0.9,
+      theme: 'Monokai Pro',
+    }
+  });
+  eruda.position({x: 5, y: 5});
+  eruda.op
+  </script>
   <div class="wrapper">
+    
     <main>
       <div class="container">
         <div class="center my-40">
@@ -68,6 +90,7 @@
 
   </div>
   <script src="assets/js/index.js"></script>
+  
 
 </body>
 </html>

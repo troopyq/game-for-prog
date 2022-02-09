@@ -585,4 +585,10 @@ h1 {
   -o-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out;
 }
+
+.console {
+  position: absolute;
+  right: 5px;
+  top: 20px;
+}
 /*# sourceMappingURL=style.css.map */
